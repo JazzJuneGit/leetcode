@@ -1,4 +1,22 @@
 507完美数
+如果是枚举的话，写出来一个耗时很久的代码
+class Solution {
+public:
+    bool checkPerfectNumber(int num) {
+        int n=num/2,sum=0;
+        for(int i=1;i<=n;i++)
+        {
+            if(num%i==0)
+                sum+=i;
+        }
+        if(sum==num)
+            return true;
+        return false;
+    }
+};
+
+题解里是这么写的：把另一个因数也加上去了
+在枚举时，我们只需要枚举不超过 √num 的数。这是因为如果 num 有一个大于 √num 的因数 d，那么它一定有一个小于 √num 的因数 num/d
 class Solution {
 public:
     bool checkPerfectNumber(int num) {
