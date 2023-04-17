@@ -1,0 +1,191 @@
+11. 盛最多水的容器
+只能想到暴力解法55555
+评论区里大佬：
+贪心策略，基本的表达式: area = min(height[i], height[j]) * (j - i) 使用两个指针，值小的指针向内移动，这样就减小了搜索空间 因为面积取决于指针的距离与值小的值乘积，如果值大的值向内移动，距离一定减小，而求面积的另外一个乘数一定小于等于值小的值，因此面积一定减小，而我们要求最大的面积，因此值大的指针不动，而值小的指针向内移动遍历
+class Solution {
+public:
+    int maxArea(vector<int>& height) {
+        if(height.size() <= 1) return -1;
+        int i = 0, j = height.size() - 1, res = 0;
+        while(i < j){
+            int h = min(height[i], height[j]);
+            res = max(res, h * (j - i));
+            if(height[i] < height[j]) ++i;
+            else --j;
+        }
+        return res;
+    }
+};
+面试就像打擂台，一套八极拳就可以晋级决赛圈！ # 刷题八极拳: 坑爹用例全出来 双分单哈滑递动 
+# 第一拳：坑爹用例全出来
+
+    最重要的一拳， 你要是少考虑了一种情况，整个算法函数就偏了，折腾半天就白耍了。卡在中间用例，或者死循环上，真噎人！即便你想到了后面的7拳，还是白耍！事实上差不多有一半的题目，它故意在例子上误导你，让你简单化算法，然后就偏了。。。
+    用例，用例！第一拳打在用例上，我觉得考虑全了，面试官，你看还漏不漏？
+
+# 后7拳：双分单哈滑递动
+
+    绝大多数题目都是1000条数据以上，这就意味着你的算法效率必须低于O(n*n), 要不会超时。想运行的快速，O(n)级的算法都给套一遍：
+    双指针：一快一慢，两端往中间走，中间往两端走，行不行吧？
+    二分：排个序，单侧加倍二分，双侧二分，中间往两边分，有没有答案？
+    单调栈：双侧单调栈刷一刷
+    哈希集合：万能的字典集合，不用白不用
+    滑动窗口：左滑一下，右滑一下，可能就过去了
+    递归：无论多少条数据，都可以万物归一递归下去，你就考虑一条的时候怎么整
+    动态规划：证明证明，我要做数学推拿
+
+面对新题目，你不可能很快想到思路，就给他耍一套八级拳，可以框住绝大多数中高难度的题目了。耍不出来的话，再耍一遍，一定是变形的题目，拳是对的，发错位置打空气了，找面试官确认哪一拳打空了？！！
+
+12. 整数转罗马数字
+嗯 写出来了
+就是比较长
+class Solution {
+public:
+    string intToRoman(int num) {
+        string res;
+        while(num)
+        {
+            if(num>=1000){
+                res+="M";
+                num-=1000;
+                continue;
+            }
+            else if(num>=900)
+            {
+                res+="CM";
+                num-=900;
+                continue;
+            }
+            else if(num>=500)
+            {
+                res+="D";
+                num-=500;
+                continue;
+            }
+            else if(num>=400)
+            {
+                res+="CD";
+                num-=400;
+                continue;
+            }
+            else if(num>=100)
+            {
+                res+="C";
+                num-=100;
+                continue;
+            }
+            else if(num>=90)
+            {
+                res+="XC";
+                num-=90;
+                continue;
+            }
+            else if(num>=50)
+            {
+                res+="L";
+                num-=50;
+                continue;
+            }
+            else if(num>=40)
+            {
+                res+="XL";
+                num-=40;
+                continue;
+            }
+            else if(num>=10)
+            {
+                res+="X";
+                num-=10;
+                continue;
+            }
+            else if(num>=9)
+            {
+                res+="IX";
+                num-=9;
+                continue;
+            }
+            else if(num>=5)
+            {
+                res+="V";
+                num-=5;
+                continue;
+            }
+            else if(num>=4)
+            {
+                res+="IV";
+                num-=4;
+                continue;
+            }
+            else if(num>=1)
+            {
+                res+="I";
+                num-=1;
+                continue;
+            }
+        }
+        return res;
+    }
+};
+更简短的写法是：
+class Solution {
+public:
+    string intToRoman(int num) {
+        int values[]={1000,900,500,400,100,90,50,40,10,9,5,4,1};
+        string reps[]={"M","CM","D","CD","C","XC","L","XL","X","IX","V","IV","I"};
+        
+        string res;
+        for(int i=0; i<13; i++){
+            while(num>=values[i]){
+                num -= values[i];
+                res += reps[i];
+            }
+        }
+        return res;
+    }
+};
+
+15. 三数之和
+想到排序了 然后就突然不会了
+想写两重循环 但是发现好像不可行，或者说比较麻烦
+这道题的难度在于如何得到不重复解
+第二个难度是我看不懂题。。。
+题解里是这么写的
+class Solution {
+public:
+    vector<vector<int>> threeSum(vector<int>& nums) {
+        int n=nums.size();
+        sort(nums.begin(),nums.end());
+        vector<vector<int>> ans;
+        // 枚举 a
+        for (int first = 0; first < n; ++first) {
+            // 需要和上一次枚举的数不相同
+            if (first > 0 && nums[first] == nums[first - 1]) {
+                continue;
+            }
+            // c 对应的指针初始指向数组的最右端
+            int third = n - 1;
+            int target = -nums[first];
+            // 枚举 b
+            for (int second = first + 1; second < n; ++second) {
+                // 需要和上一次枚举的数不相同
+                if (second > first + 1 && nums[second] == nums[second - 1]) {
+                    continue;
+                }
+                // 需要保证 b 的指针在 c 的指针的左侧
+                while (second < third && nums[second] + nums[third] > target) {
+                    --third;
+                }
+                // 如果指针重合，随着 b 后续的增加
+                // 就不会有满足 a+b+c=0 并且 b<c 的 c 了，可以退出循环
+                if (second == third) {
+                    break;
+                }
+                if (nums[second] + nums[third] == target) {
+                    ans.push_back({nums[first], nums[second], nums[third]});
+                }
+            }
+        }
+        return ans;
+    }
+};
+
+
