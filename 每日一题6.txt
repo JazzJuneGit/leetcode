@@ -1,0 +1,133 @@
+昨天写的每日一题5怎么看不见了。。。
+19. 删除链表的倒数第 N 个结点
+这道题还是会做的 直接双指针就可以了
+class Solution {
+public:
+    ListNode* removeNthFromEnd(ListNode* head, int n) {
+        ListNode* p=head,*q=head;
+        while(p->next!=nullptr)
+        {
+            p=p->next;
+            n--;
+            if(n<0)
+                q=q->next;
+        }
+        ListNode* temp=q;
+        if(n==1)
+            return head->next;
+        temp->next=q->next->next;
+        return head;
+    }
+};
+比较需要注意的是要删除第一个节点，这个时候可以直接返回head -> next
+
+22. 括号生成
+懵了 不会
+原来这种题目可以视作在树上求解 然后DFS+回溯 进行一些剪枝就可以了
+在评论区看到一个很清奇的递归解法
+class Solution {
+public:
+    vector<string> generateParenthesis(int n) {
+        if (n == 1) return {"()"};
+        unordered_map<string, int> a;
+        vector<string> res;
+        string tmp;
+        for (auto& s: generateParenthesis(n - 1)) {
+            for (int i = 0; i != 2 * (n - 1); ++i) {
+                tmp = s.substr(0, i) + "()" + s.substr(i, 2 * (n - 1));
+                if (a[tmp] == 0) {
+                    ++a[tmp];
+                    res.emplace_back(tmp);
+                }
+            }
+        }
+        return res;
+    }
+};
+其实就是对于两个括号   有0（1）2三种插入第二个括号的插法
+然后去除0 2的重复就行了
+dfs的方法是
+class Solution {
+public:
+    vector<string> generateParenthesis(int n) {
+        dfs("", n, n);
+        return res;
+    }
+private:
+    vector<string> res;
+    void dfs(const string& str, int left, int right) {
+        if (left < 0 || left > right)  // 出现类似 ()) )) 这种格式都是错误的不用再继续了
+            return;
+        if (left == 0 && right == 0) {
+            res.push_back(str);
+            return;
+        }
+        dfs(str + '(', left - 1, right);
+        dfs(str + ')', left, right - 1);
+    }
+};
+剪枝的条件为：左括号的数目一旦小于右括号的数目，以及，左括号的数目和右括号数目均小于n
+回溯的灵魂就是画出树结构图
+这里学习一下回溯：
+简单来说，回溯就是要消除搜索过程中的不同可能性之间对中间变量的影响
+在具体的写法上，它与普通的深度优先搜索一样，都有 [修改当前节点状态]→[递归子节点] 的步骤，只是多了回溯的步骤，变成了 [修改当前节点状态]→[递归子节点]→[回改当前节点状态]。
+
+24. 两两交换链表中的节点
+自己写出来的！！！
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* swapPairs(ListNode* head) {
+        if(head==nullptr||head->next==nullptr)
+            return head;
+        ListNode* p=head,*q=head;
+        int flag=0;
+        head=head->next;
+        while(p!=nullptr)
+        {
+            if(p->next!=nullptr){
+                ListNode* temp=p->next->next;
+                p->next->next=p;
+                if(flag)
+                {
+                    q->next=p->next;
+                }
+                p->next=temp;
+                q=p;
+                p=temp;
+                flag=1;
+            }
+            else return head;
+        }
+        return head;
+    }
+};
+嘿嘿
+在纸上写写画画推出来的
+递归的写法是这样的：
+class Solution {
+public:
+    ListNode* swapPairs(ListNode* head) {
+        if (head == nullptr || head->next == nullptr) {
+            return head;
+        }
+        ListNode* newHead = head->next;
+        head->next = swapPairs(newHead->next);
+        newHead->next = head;
+        return newHead;
+    }
+};
+这里 看了一个大佬关于递归的博客：https://lyl0724.github.io/2020/01/25/1/
+何为递归？程序反复调用自身即是递归。
+我自己在刚开始解决递归问题的时候，总是会去纠结这一层函数做了什么，它调用自身后的下一层函数又做了什么…然后就会觉得实现一个递归解法十分复杂，根本就无从下手。
+相信很多初学者和我一样，这是一个思维误区，一定要走出来。既然递归是一个反复调用自身的过程，这就说明它每一级的功能都是一样的，因此我们只需要关注一级递归的解决过程即可。
+大部分链表和树的递归题都能这么秒，因为树和链表天生就是适合递归的结构。
