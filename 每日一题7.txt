@@ -1,0 +1,223 @@
+28. 找出字符串中第一个匹配项的下标
+想到KMP但是我不会写呃呃呃呃
+结合题解写了暴力法
+class Solution {
+public:
+    int strStr(string haystack, string needle) {
+        int n = haystack.size(), m = needle.size();
+        for(int i=0;i<=n-m;i++)
+        {
+            bool flag=true;
+            for(int j=0;j<m;j++)
+            {
+                if(haystack[i+j]!=needle[j])
+                {
+                    flag=false;
+                    break;
+                }
+            }
+            if(flag)
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
+};
+我怎么连暴力法都不会写了（恼
+KMP写法如下：
+class Solution {
+public:
+    int strStr(string s, string p) {
+        int n = s.size(), m = p.size();
+        if(m == 0) return 0;
+        //设置哨兵
+        s.insert(s.begin(),' ');
+        p.insert(p.begin(),' ');
+        vector<int> next(m + 1);
+        //预处理next数组
+        for(int i = 2, j = 0; i <= m; i++){
+            while(j and p[i] != p[j + 1]) j = next[j];
+            if(p[i] == p[j + 1]) j++;
+            next[i] = j;
+        }
+        //匹配过程
+        for(int i = 1, j = 0; i <= n; i++){
+            while(j and s[i] != p[j + 1]) j = next[j];
+            if(s[i] == p[j + 1]) j++;
+            if(j == m) return i - m;
+        }
+        return -1;
+    }
+};
+「KMP 匹配」过程：
+首先匹配串会检查之前已经匹配成功的部分中里是否存在相同的「前缀」和「后缀」。如果存在，则跳转到「前缀」的下一个位置继续往下匹配：
+跳转到下一匹配位置后，尝试匹配，发现两个指针的字符对不上，并且此时匹配串指针前面不存在相同的「前缀」和「后缀」，这时候只能回到匹配串的起始位置重新开始：
+
+从匹配串某个位置跳转下一个匹配位置这一过程是与原串无关的，我们将这一过程称为找 next 点。
+显然我们可以预处理出 next 数组，数组中每个位置的值就是该下标应该跳转的目标位置（ next 点）。
+构造next数组其实就是计算模式串s，前缀表的过程。 主要有如下三步：
+    初始化
+    处理前后缀不相同的情况
+    处理前后缀相同的情况
+接下来我们详解解释一下。
+    初始化：
+定义两个指针i和j，j指向前缀终止位置（严格来说是终止位置减一的位置），i指向后缀终止位置（与j同理）。
+然后还要对next数组进行初始化赋值，如下：
+int j = -1;
+next[0] = j;
+j 为什么要初始化为 -1呢，因为之前说过 前缀表要统一减一的操作仅仅是其中的一种实现，我们这里选择j初始化为-1，下文我还会给出j不初始化为-1的实现代码。
+next[i] 表示 i（包括i）之前最长相等的前后缀长度（其实就是j），所以初始化next[0] = j 。
+    处理前后缀不相同的情况
+因为j初始化为-1，那么i就从1开始，进行s[i] 与 s[j+1]的比较。
+所以遍历模式串s的循环下标i 要从 1开始，代码如下：
+for(int i = 1; i < s.size(); i++) {
+如果 s[i] 与 s[j+1]不相同，也就是遇到 前后缀末尾不相同的情况，就要向前回溯。
+怎么回溯呢？
+next[j]就是记录着j（包括j）之前的子串的相同前后缀的长度。
+那么 s[i] 与 s[j+1] 不相同，就要找 j+1前一个元素在next数组里的值（就是next[j]）。
+所以，处理前后缀不相同的情况代码如下：
+while (j >= 0 && s[i] != s[j + 1]) { // 前后缀不相同了
+    j = next[j]; // 向前回溯
+}
+    处理前后缀相同的情况
+如果s[i] 与 s[j + 1] 相同，那么就同时向后移动i 和j 说明找到了相同的前后缀，同时还要将j（前缀的长度）赋给next[i], 因为next[i]要记录相同前后缀的长度。
+代码如下：
+if (s[i] == s[j + 1]) { // 找到相同的前后缀
+    j++;
+}
+next[i] = j;
+最后整体构建next数组的函数代码如下：
+void getNext(int* next, const string& s){
+    int j = -1;
+    next[0] = j;
+    for(int i = 1; i < s.size(); i++) { // 注意i从1开始
+        while (j >= 0 && s[i] != s[j + 1]) { // 前后缀不相同了
+            j = next[j]; // 向前回溯
+        }
+        if (s[i] == s[j + 1]) { // 找到相同的前后缀
+            j++;
+        }
+        next[i] = j; // 将j（前缀的长度）赋给next[i]
+    }
+}
+得到了next数组之后，就要用这个来做匹配了。
+使用next数组来做匹配
+在文本串s里 找是否出现过模式串t。
+定义两个下标j 指向模式串起始位置，i指向文本串其实位置。
+那么j初始值依然为-1，为什么呢？ 依然因为next数组里记录的起始位置为-1。
+i就从0开始，遍历文本串，代码如下：
+for (int i = 0; i < s.size(); i++) 
+接下来就是 s[i] 与 t[j + 1] （因为j从-1开始的） 经行比较。如果 s[i] 与 t[j + 1] 不相同，j就要从next数组里寻找下一个匹配的位置。
+代码如下：
+while(j >= 0 && s[i] != t[j + 1]) {
+    j = next[j];
+}
+如果 s[i] 与 t[j + 1] 相同，那么i 和 j 同时向后移动， 代码如下：
+if (s[i] == t[j + 1]) {
+    j++; // i的增加在for循环里
+}
+如何判断在文本串s里出现了模式串t呢，如果j指向了模式串t的末尾，那么就说明模式串t完全匹配文本串s里的某个子串了。
+本题要在文本串字符串中找出模式串出现的第一个位置 (从0开始)，所以返回当前在文本串匹配模式串的位置i 减去 模式串的长度，就是文本串字符串中出现模式串的第一个位置。
+代码如下：
+if (j == (t.size() - 1) ) {
+    return (i - t.size() + 1);
+}
+那么使用next数组，用模式串匹配文本串的整体代码如下：
+int j = -1; // 因为next数组里记录的起始位置为-1
+for (int i = 0; i < s.size(); i++) { // 注意i就从0开始
+    while(j >= 0 && s[i] != t[j + 1]) { // 不匹配
+        j = next[j]; // j 寻找之前匹配的位置
+    }
+    if (s[i] == t[j + 1]) { // 匹配，j和i同时向后移动
+        j++; // i的增加在for循环里
+    }
+    if (j == (t.size() - 1) ) { // 文本串s里出现了模式串t
+        return (i - t.size() + 1);
+    }
+}
+
+29. 两数相除
+不会啊不会啊不会啊
+这回连题解都看不懂了
+class Solution {
+public:
+    int divide(int dividend, int divisor) {
+        // 考虑被除数为最小值的情况
+        if (dividend == INT_MIN) {
+            if (divisor == 1) {
+                return INT_MIN;
+            }
+            if (divisor == -1) {
+                return INT_MAX;
+            }
+        }
+        // 考虑除数为最小值的情况
+        if (divisor == INT_MIN) {
+            return dividend == INT_MIN ? 1 : 0;
+        }
+        // 考虑被除数为 0 的情况
+        if (dividend == 0) {
+            return 0;
+        }
+        
+        // 一般情况，使用二分查找
+        // 将所有的正数取相反数，这样就只需要考虑一种情况
+        bool rev = false;
+        if (dividend > 0) {
+            dividend = -dividend;
+            rev = !rev;
+        }
+        if (divisor > 0) {
+            divisor = -divisor;
+            rev = !rev;
+        }
+
+        // 快速乘
+        auto quickAdd = [](int y, int z, int x) {
+            // x 和 y 是负数，z 是正数
+            // 需要判断 z * y >= x 是否成立
+            int result = 0, add = y;
+            while (z) {
+                if (z & 1) {
+                    // 需要保证 result + add >= x
+                    if (result < x - add) {
+                        return false;
+                    }
+                    result += add;
+                }
+                if (z != 1) {
+                    // 需要保证 add + add >= x
+                    if (add < x - add) {
+                        return false;
+                    }
+                    add += add;
+                }
+                // 不能使用除法
+                z >>= 1;
+            }
+            return true;
+        };
+        
+        int left = 1, right = INT_MAX, ans = 0;
+        while (left <= right) {
+            // 注意溢出，并且不能使用除法
+            int mid = left + ((right - left) >> 1);
+            bool check = quickAdd(divisor, mid, dividend);
+            if (check) {
+                ans = mid;
+                // 注意溢出
+                if (mid == INT_MAX) {
+                    break;
+                }
+                left = mid + 1;
+            }
+            else {
+                right = mid - 1;
+            }
+        }
+
+        return rev ? -ans : ans;
+    }
+};
+明天再学
