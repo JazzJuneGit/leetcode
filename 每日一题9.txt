@@ -57,3 +57,95 @@ public:
     vector<int> list;
 };
 抄的 
+
+40. 组合总和 II
+就...还是回溯法呗
+主要关键点在去重
+看了评论区才发现只要当前索引大于本层递归的起始索引，且等于前一个元素 就continue就行
+class Solution {
+public:
+    vector<vector<int>> combinationSum2(vector<int>& candidates, int target) {
+        sort(candidates.begin(),candidates.end());
+        dfs(candidates,target,0);
+        return res;
+    }
+    void dfs(vector<int> candidates,int target,int cur)
+    {
+        if(target==0)
+        {
+            res.push_back(list);
+            return;
+        }
+        for(int i=cur;i<candidates.size();i++)
+        {
+            if(candidates[i]>target)
+                return;
+            if(i>cur&&candidates[i]==candidates[i-1])
+                continue;
+            list.push_back(candidates[i]);
+            dfs(candidates,target-candidates[i],i+1);
+            list.pop_back();
+        }
+    }
+    vector<vector<int>> res;
+    vector<int> list;
+};
+
+43. 字符串相乘
+大佬的思路
+用数组模拟乘法。创建一个数组⻓度为 len(num1) + len(num2) 的数组用于存储乘积。对于任意 0 ≤ i < len(num1) ， 0 ≤ j < len(num2) ， num1[i] * num2[j] 的结果位于 tmp[i+j+1] ，如果 tmp[i+j+1]≥10 ，则将进位部分加到 tmp[i+j] 。最后，将数组 tmp 转成字符串，如果最高位是 0 则舍弃最高位。
+根据大佬的思路写出：
+class Solution {
+public:
+    string multiply(string num1, string num2) {
+        if(num1=="0"||num2=="0")
+            return "0";
+        int size1=num1.size(),size2=num2.size();
+        //int mul[size1+size2+1];
+        auto mul = vector<int>(size1 + size2+1);
+        string ans;
+        for(int i=size1-1;i>=0;i--)
+        {
+            for(int j=size2-1;j>=0;j--)
+            {
+                int cur=(num1[i]-'0')*(num2[j]-'0');
+                mul[i+j+1]+=cur;
+                if(mul[i+j+1]>=10)
+                {
+                    mul[i+j]+=mul[i+j+1]/10;
+                    mul[i+j+1]%=10;
+                }
+            }
+        }
+        for(int i=0;i<size1+size2;i++)
+        {
+            if(i==0&&mul[i]==0)
+                continue;
+            ans+=mul[i]+'0';
+        }
+        return ans;
+    }
+};
+
+45. 跳跃游戏 II
+嗯不知道怎么做
+大佬说很自然地想到贪心算法：
+扫描步数数组，维护当前能够到达最大下标的位置，记为能到达的最远边界，如果扫描过程中到达了最远边界，更新边界并将跳跃次数 + 1。
+扫描数组的时候，其实不需要扫描最后一个元素，因为在跳到最后一个元素之前，能到达的最远边界一定大于等于最后一个元素的位置，不然就跳不到最后一个元素，到达不了终点了；如果遍历到最后一个元素，说明边界正好为最后一个位置，最终跳跃次数直接 + 1 即可，也不需要访问最后一个元素。
+写半天答案不对 烦了，复制题解算了
+class Solution {
+public:
+    int jump(vector<int>& nums) {
+        int maxPos = 0, n = nums.size(), end = 0, step = 0;
+        for (int i = 0; i < n - 1; ++i) {
+            if (maxPos >= i) {
+                maxPos = max(maxPos, i + nums[i]);
+                if (i == end) {
+                    end = maxPos;
+                    ++step;
+                }
+            }
+        }
+        return step;
+    }
+};
