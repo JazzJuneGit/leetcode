@@ -1,0 +1,46 @@
+不想学习 放假没放够
+46. 全排列
+现在的进步就是 一看到这道题就知道用回溯
+但是不知道怎么做。。。
+看了评论区的题解
+class Solution {
+public:
+    vector<vector<int>> result;
+    vector<int> path;
+    void backtracking (vector<int>& nums, vector<bool>& used)
+    {
+        if(path.size()==nums.size())
+        {
+            result.push_back(path);
+            return;
+        }
+        for(int i=0;i<nums.size();i++)
+        {
+            if(used[i]==true) continue;
+            used[i]=true;
+            path.push_back(nums[i]);
+            backtracking(nums,used);
+            path.pop_back();
+            used[i]=false;
+        }
+    }
+    vector<vector<int>> permute(vector<int>& nums) {
+        result.clear();
+        path.clear();
+        vector<bool>used(nums.size(),false);
+        backtracking(nums,used);
+        return result;
+    }
+};
+其实只要考虑终止条件单次循环部分就可以了 考虑一下函数参数和返回值
+result = []
+def backtrack(路径, 选择列表):
+    if 满足结束条件:
+        result.add(路径)
+        return
+    
+    for 选择 in 选择列表:
+        做选择
+        backtrack(路径, 选择列表)
+        撤销选择
+        
