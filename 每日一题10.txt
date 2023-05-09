@@ -44,3 +44,54 @@ def backtrack(路径, 选择列表):
         backtrack(路径, 选择列表)
         撤销选择
         
+47. 全排列 II
+还是没写出来 去重那里不太会 想用set来着 看了评论区
+要强调的是去重一定要对元素进行排序，这样我们才方便通过相邻的节点来判断是否重复使用了
+class Solution {
+public:
+    vector<vector<int>> result;
+    vector<int> path;
+    void backtracking (vector<int>& nums, vector<bool>& used)
+    {
+        if(path.size()==nums.size())
+        {
+            result.push_back(path);
+            return;
+        }
+        for(int i=0;i<nums.size();i++)
+        {
+            if(used[i]==true) continue;
+            if(i>0&&nums[i]==nums[i-1]&&used[i-1]==false) continue;
+            used[i]=true;
+            path.push_back(nums[i]);
+            backtracking(nums,used);
+            path.pop_back();
+            used[i]=false;
+        }
+    }
+    vector<vector<int>> permuteUnique(vector<int>& nums) {
+        result.clear();
+        path.clear();
+        sort(nums.begin(), nums.end());
+        vector<bool> used(nums.size(),false);
+        backtracking(nums,used);
+        return result;
+    }
+};
+
+48. 旋转图像
+我是废物...
+又是不会做的一题
+顺时针旋转可以先上下翻转，再主对角线镜像（就是转置
+逆时针旋转可以先左右翻转，再主对角线镜像
+class Solution {
+public:
+    void rotate(vector<vector<int>>& matrix) {
+        reverse(matrix.begin(),matrix.end());
+        for(int i=0;i<matrix.size();i++)
+            for(int j=i;j<matrix.size();j++)
+                swap(matrix[i][j],matrix[j][i]);
+    }
+};
+
+49. 字母异位词分组
