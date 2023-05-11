@@ -1,0 +1,104 @@
+49. 字母异位词分组
+脑子完全转不动了，怎么回事呢
+把每个字符串排序后，相同的排序结果的就是异位词
+class Solution {
+public:
+    vector<vector<string>> groupAnagrams(vector<string>& strs) {
+        unordered_map<string, vector<string>> mp;
+        for (string& str: strs) {
+            string key = str;
+            sort(key.begin(), key.end());
+            mp[key].emplace_back(str);
+        }
+        vector<vector<string>> ans;
+        for (auto it = mp.begin(); it != mp.end(); ++it) {
+            ans.emplace_back(it->second);
+        }
+        return ans;
+    }
+};
+50. Pow(x, n)
+最开始是这么写的
+class Solution {
+public:
+    double myPow(double x, int n) {
+        double ans=1;
+        if(n>0){
+            while(n--)
+            {
+                ans*=x;
+            }
+        }
+        else{
+            x=1/x;
+            while(n++)
+            {
+                ans*=x;
+            }
+        }
+        return  ans;
+    }
+};
+肯定超时啦
+应该折半做
+不过这个时候思路有点懵，没用递归写，照着评论区的方法写的
+class Solution {
+public:
+    double myPow(double x, int n) {
+        double ans=1;
+        int flag=0;
+        if(n<0){
+            flag=1;
+        }
+        while(n)
+        {
+            if(n%2)
+            {
+                ans=ans*x;
+            }
+            x=x*x;
+            n/=2;
+        }
+        if(flag)
+            ans=1/ans;
+        return  ans;
+    }
+};
+有点点慢
+
+53. 最大子数组和
+贪心算法吧
+不过不知道具体怎么贪。。。
+代码随想录这么写：
+如果 -2 1 在一起，计算起点的时候，一定是从 1 开始计算，因为负数只会拉低总和，这就是贪心贪的地方！
+局部最优：当前“连续和”为负数的时候立刻放弃，从下一个元素重新计算“连续和”，因为负数加上下一个元素 “连续和”只会越来越小。
+全局最优：选取最大“连续和”
+**局部最优的情况下，并记录最大的“连续和”，可以推出全局最优**。
+从代码角度上来讲：遍历 nums，从头开始用 count 累积，如果 count 一旦加上 nums[i]变为负数，那么就应该从 nums[i+1]开始从 0 累积 count 了，因为已经变为负数的 count，只会拖累总和。
+class Solution {
+public:
+    int maxSubArray(vector<int>& nums) {
+        int count=0;
+        int result=INT_MIN;
+        for(int i=0;i<nums.size();i++)
+        {
+            count+=nums[i];
+            if(count>result)
+                result=count;
+            if(count<0) count=0;
+        }
+        return result;
+    }
+};
+真的好巧妙啊
+误区：
+大家在使用贪心算法求解本题，经常陷入的误区，就是分不清，是遇到 负数就选择起始位置，还是连续和为负选择起始位置。
+在动画演示用，大家可以发现， 4，遇到 -1 的时候，我们依然累加了，为什么呢？
+因为和为 3，只要连续和还是正数就会 对后面的元素 起到增大总和的作用。 所以只要连续和为正数我们就保留。
+这里也会有录友疑惑，那 4 + -1 之后 不就变小了吗？ 会不会错过 4 成为最大连续和的可能性？
+其实并不会，因为还有一个变量 result 一直在更新 最大的连续和，只要有更大的连续和出现，result 就更新了，那么 result 已经把 4 更新了，后面 连续和变成 3，也不会对最后结果有影响。
+我也有这样的顾虑，不过是遇到连续和为负时如何选择起始位置，需不需要在前面选择
+其实是不需要的
+因为在当前位置第一次变为负数的话，说明当前位置的负数很大，比前面任何一个位置起始之和都大，否则就会在前面就为负了
+其实动态规划也可以做
+不过以后再练吧
