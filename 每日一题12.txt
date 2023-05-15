@@ -1,0 +1,83 @@
+54. 螺旋矩阵
+知道怎么做，但是不会写
+对于这种螺旋遍历的方法，重要的是要确定上下左右四条边的位置，那么初始化的时候，上边up就是0，下边down就是m-1，左边left是0，右边right是n-1。然后我们进行while循环，先遍历上边，将所有元素加入结果res，然后上边下移一位，如果此时上边大于下边，说明此时已经遍历完成了，直接break。
+首先设定上下左右边界
+其次向右移动到最右，此时第一行因为已经使用过了，可以将其从图中删去，体现在代码中就是重新定义上边界
+判断若重新定义后，上下边界交错，表明螺旋矩阵遍历结束，跳出循环，返回答案
+若上下边界不交错，则遍历还未结束，接着向下向左向上移动，操作过程与第一，二步同理
+不断循环以上步骤，直到某两条边界交错，跳出循环，返回答案
+class Solution {
+public:
+    vector<int> spiralOrder(vector<vector<int>>& matrix) {
+        if(matrix.empty()||matrix[0].empty())
+            return {};
+        vector<int> res;
+        int m=matrix.size(),n=matrix[0].size();
+        int up=0,down=m-1,left=0,right=n-1;
+        while(true)
+        {
+            for(int i=left;i<=right;i++)
+                res.push_back(matrix[up][i]);
+            if(++up>down)
+                break;
+            for(int i=up;i<=down;i++)
+                res.push_back(matrix[i][right]);
+            if(--right<left)
+                break;
+            for(int i=right;i>=left;i--)
+                res.push_back(matrix[down][i]);
+            if(--down<up)
+                break;
+            for(int i=down;i>=up;i--)
+                res.push_back(matrix[i][left]);
+            if(++left>right)
+                break;
+        }
+        return res;
+    }
+};
+哎
+
+55. 跳跃游戏
+好有既视感的一道题
+class Solution {
+public:
+    bool canJump(vector<int>& nums) {
+        int cur=0,max=0;
+        for(int i=0;i<nums.size();i++)
+        {
+            if(i>max)
+                return false;
+            cur=i+nums[i];
+            if(cur>max)
+                max=cur;
+            if(max>nums.size())
+                return true;
+        }
+        return true;
+    }
+};
+这道是我自己写的
+贪心算法做的
+
+56. 合并区间
+大概知道怎么做 但是不会写lamda表达式的排序函数
+而且vector可以用back()来表示最后一个元素
+class Solution {
+public:
+    vector<vector<int>> merge(vector<vector<int>>& intervals) {
+        vector<vector<int>> res;
+        if(intervals.size()==0)
+            return {};
+        sort(intervals.begin(),intervals.end(),[](const vector<int>& a,const vector<int>& b){return a[0]<b[0];});
+        res.push_back(intervals[0]);
+        for(int i=1;i<intervals.size();i++)
+        {
+            if(res.back()[1]>=intervals[i][0])
+                res.back()[1]=max(res.back()[1], intervals[i][1]);
+            else res.push_back(intervals[i]);
+        }
+        return res;
+    }
+};
+原理很简单，就是具体不会写
