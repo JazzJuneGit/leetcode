@@ -1,0 +1,103 @@
+57. 插入区间
+就 做暴力写边界条件，然后写得很烦
+结果评论区的方法就很简单啊，就是上道题的翻版。。。
+代码随想录的解法是：
+class Solution {
+public:
+    vector<vector<int>> insert(vector<vector<int>>& intervals, vector<int>& newInterval) {
+        vector<vector<int>> result;
+        int index = 0; // intervals的索引
+        // 步骤一：找到需要合并的区间
+        while (index < intervals.size() && intervals[index][1] < newInterval[0]) {
+            result.push_back(intervals[index++]);
+        }
+        // 步骤二：合并区间
+        while (index < intervals.size() && intervals[index][0] <= newInterval[1]) {
+            newInterval[0] = min(intervals[index][0], newInterval[0]);
+            newInterval[1] = max(intervals[index][1], newInterval[1]);
+            index++;
+        }
+        result.push_back(newInterval);
+        // 步骤三：处理合并区间之后的区间
+        while (index < intervals.size()) {
+            result.push_back(intervals[index++]);
+        }
+        return result;
+    }
+};
+为什么我写不出来啊
+
+59. 螺旋矩阵 II
+和54题其实区别不大，代码稍作修改即可
+class Solution {
+public:
+    vector<vector<int>> generateMatrix(int n) {
+        vector<vector<int>> res(n,vector<int>(n,0));
+        int num=n*n-1,count=1;
+        int up=0,down=n-1,left=0,right=n-1;
+        while(true)
+        {
+            for(int i=left;i<=right;i++)
+                res[up][i]=count++;
+            if(++up>down)
+                break;
+            for(int i=up;i<=down;i++)
+                res[i][right]=count++;
+            if(--right<left)
+                break;
+            for(int i=right;i>=left;i--)
+                res[down][i]=count++;
+            if(--down<up)
+                break;
+            for(int i=down;i>=up;i--)
+                res[i][left]=count++;
+            if(++left>right)
+                break;
+        }
+        return res;
+    }
+};
+
+61. 旋转链表
+我想到的做法就是把收尾连接，然后挪动到该断掉的位置断掉
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* rotateRight(ListNode* head, int k) {
+        if(head==nullptr||head->next==nullptr)
+            return head;
+        ListNode* p=head;
+        int num=1;
+        while(true)
+        {
+            if(p->next!=nullptr){
+                p=p->next;
+                num++;
+            }
+            else {
+                p->next=head;
+                break;
+            }
+        }
+        k%=num;
+        num-=k;
+        num--;
+        while(num--)
+        {
+            head=head->next;
+        }
+        p=head->next;
+        head->next=nullptr;
+        return p;
+    }
+};
+这个是自己想出来的，不过在计算怎么挪动到该到的位置上有点小卡住，在如果挪动次数>链表长度上有点死脑筋，其实只需要取余嘛
