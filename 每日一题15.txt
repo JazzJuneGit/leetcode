@@ -1,0 +1,96 @@
+71. 简化路径
+看到题的第一眼 就开始困了
+照评论抄的
+class Solution {
+public:
+    string simplifyPath(string path) {
+        vector<string> v;
+        istringstream iss(path);
+        string buf;
+        while(getline(iss,buf,'/')){
+            if(!buf.empty()&&buf!="."&&buf!="..")
+                v.push_back(buf);
+            else if(!v.empty()&&buf=="..")
+                v.pop_back();
+        }
+        if(v.empty())
+        {
+            return "/";
+        }
+        buf.clear();
+        for(string &s:v){
+            buf+="/";
+            buf+=s;
+        }
+        return buf;
+    }
+};
+
+73. 矩阵置零
+emmmm不知道原地该怎么该
+大佬的思路：
+此题考查对程序的控制能⼒，⽆算法思想。题⽬要求采⽤原地的算法，所有修改即在原⼆维数组上进⾏。在⼆维数组中有 2 个特殊位置，⼀个是第⼀⾏，⼀个是第⼀列。它们的特殊性在于，它们之间只要有⼀个 0，它们都会变为全 0 。先⽤ 2 个变量记录这⼀⾏和这⼀列中是否有 0，防⽌之后的修改覆盖了这 2 个地⽅。然后除去这⼀⾏和这⼀列以外的部分判断是否有 0，如果有 0，将它们所在的⾏第⼀个元素标记为 0，所在列的第⼀个元素标记为 0 。最后通过标记，将对应的⾏列置 0 即可。
+好叭 原来是这样
+class Solution {
+public:
+    void setZeroes(vector<vector<int>>& matrix) {
+        int m=matrix.size(),n=matrix[0].size();
+        bool rowFlag=false,colFlag=false;
+        for(int i=0;i<m;i++)
+        {
+            if(matrix[i][0]==0){
+                colFlag=true;
+                break;
+            }
+        }
+        for(int i=0;i<n;i++)
+        {
+            if(matrix[0][i]==0){
+                rowFlag=true;
+                break;
+            }
+        }
+        for(int i=1;i<m;i++)
+        {
+            for(int j=1;j<n;j++)
+            {
+                if(matrix[i][j]==0){
+                    matrix[i][0]=0;
+                    matrix[0][j]=0;
+                }
+            }
+        }
+        for(int i=1;i<m;i++)
+            for(int j=1;j<n;j++)
+            {
+                if(matrix[i][0]==0||matrix[0][j]==0)
+                    matrix[i][j]=0;
+            }
+        if(colFlag)
+            for(int i=0;i<m;i++)
+                matrix[i][0]=0;
+        if(rowFlag)
+            for(int i=0;i<n;i++)
+                matrix[0][i]=0;
+    }
+};
+
+74. 搜索二维矩阵
+高效的算法
+二分法？
+class Solution {
+public:
+    bool searchMatrix(vector<vector<int>>& matrix, int target) {
+        if(matrix.empty()||matrix[0].empty())return 0;
+        int left=0,right=matrix.size()*matrix[0].size()-1;
+        int len=matrix[0].size();
+        while(left<=right)
+        {
+            int mid=left+(right-left)/2;
+            if(matrix[mid/len][mid%len]>target) right=mid-1;
+            else if(matrix[mid/len][mid%len]<target) left=mid+1;
+            else return true;
+        }
+        return false;
+    }
+};
