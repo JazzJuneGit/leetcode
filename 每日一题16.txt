@@ -1,0 +1,44 @@
+75. 颜色分类
+其实就是排序
+我想写三个游标那种来着，但是没想清楚三个游标怎么取初值
+学习了一下题解里双指针的做法
+class Solution {
+public:
+    void sortColors(vector<int>& nums) {
+        int n = nums.size();
+        int p0 = 0, p2 = n - 1;
+        for (int i = 0; i <= p2; ++i) {
+            while (i <= p2 && nums[i] == 2) {
+                swap(nums[i], nums[p2]);
+                --p2;
+            }
+            if (nums[i] == 0) {
+                swap(nums[i], nums[p0]);
+                ++p0;
+            }
+        }
+    }
+};
+评论区三游标有一个很神的做法
+class Solution {
+    public void sortColors(int[] nums) {
+        int num0 = 0, num1 = 0, num2 = 0;
+        for(int i = 0; i < nums.length; i++) {
+            if(nums[i] == 0) {
+                nums[num2++] = 2;
+                nums[num1++] = 1;
+                nums[num0++] = 0;
+            }else if(nums[i] == 1) {
+                nums[num2++] = 2;
+                nums[num1++] = 1;
+            }else {
+                nums[num2++] = 2;
+            }
+        }
+    }
+}
+不知道怎么想出来的
+
+77. 组合
+回溯，又是你回溯
+
