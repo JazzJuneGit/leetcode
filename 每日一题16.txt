@@ -41,4 +41,30 @@ class Solution {
 
 77. 组合
 回溯，又是你回溯
+class Solution {
+public:
+    vector<vector<int>> res;
+    vector<int> path;
+    void backtracking(int n,int k,int startIndex)
+    {
+        if(path.size()==k)
+        {
+            res.push_back(path);
+            return;
+        }
+        for(int i=startIndex;i<=n;i++)
+        {
+            path.push_back(i);
+            backtracking(n,k,i+1);
+            path.pop_back();
+        }
+    }
+    vector<vector<int>> combine(int n, int k) {
+        backtracking(n,k,1);
+        return res;
+    }
+};
+照着卡尔写的 哎 有会写的感觉了，但是还是麻爪
+startIndex可以避免重复
 
+78. 子集
