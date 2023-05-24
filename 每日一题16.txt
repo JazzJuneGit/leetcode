@@ -68,3 +68,31 @@ public:
 startIndex可以避免重复
 
 78. 子集
+class Solution {
+public:
+    vector<vector<int>> res;
+    vector<int> path;
+    void backtracking(vector<int>& nums,int k,int startIndex)
+    {
+        if(path.size()==k)
+        {
+            res.push_back(path);
+            return;
+        }
+        for(int i=startIndex;i<nums.size();i++)
+        {
+            path.push_back(nums[i]);
+            backtracking(nums,k,i+1);
+            path.pop_back();
+        }
+    }
+    vector<vector<int>> subsets(vector<int>& nums) {
+        for(int i=0;i<nums.size();i++)
+        {
+            backtracking(nums,i,0);
+        }
+        res.push_back(nums);
+        return res;
+    }
+};
+自己写的 不过也就是改改上一道题
